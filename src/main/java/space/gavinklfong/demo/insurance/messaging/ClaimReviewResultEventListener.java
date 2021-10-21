@@ -12,7 +12,7 @@ import space.gavinklfong.demo.insurance.service.ClaimReviewService;
 @Component
 public class ClaimReviewResultEventListener {
 
-    @StreamListener(MessageChannels.CLAIM_STATUS_INPUT)
+//    @StreamListener(MessageChannels.CLAIM_STATUS_INPUT)
     public void handleClaimRequestEvent(ClaimReviewResult claimReviewResult) {
         log.info("Claim result generated: " + claimReviewResult);
     }

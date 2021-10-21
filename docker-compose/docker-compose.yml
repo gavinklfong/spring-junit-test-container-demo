@@ -33,9 +33,11 @@ services:
     container_name: mongodb
     environment:
       MONGO_INITDB_DATABASE: testdb
+    ports:
+      - 27017:27017
 
   insurance-claim-processor:
-    image: whalebig27/demo-insurance-claim-processor
+    image: whalebig27/demo-junit-insurance-claim-processor
     container_name: insurance-claim-processor
     depends_on:
       - mongodb

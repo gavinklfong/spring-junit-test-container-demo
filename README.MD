@@ -1,7 +1,7 @@
-# Integration Test Demo For Spring Boot 
+# Test Cointainer Demo For Spring Boot Using JUnit
 
 ## Overview
-The purpose of this repository is to demonstrate the implementation of a fully automated integration test using Cucumber + Testcontainers.
+The purpose of this repository is to demonstrate the implementation of a fully automated integration test using JUnit + Testcontainers.
 
 The sample application is a message driven insurance claim review process.
 
@@ -15,20 +15,10 @@ Run this command to build and run all automated tests
 
 If you would like to run the integration test only, then run this command
 
-`mvn -Dtest=CucumberTest test`
+`mvn -Dtest=ClaimProcessingIntegrationTest test`
 
 ## Integration Test Initialization
 
-Prior to the test execution, Testcontainers are to be initialized and started. Next, the hostname and port of the containers are injected into the Spring Boot application context so that the application can be started with connectivity to the containers. Finally, run the test scenarios based on cucumber feature files.
+The sample JUnit test class is `integration.tests.ClaimProcessingIntegrationTest`. It extends from `integration.AbstractIntegrationTest` which is responsible for initialize rabbitmq and mongodb in test containers and bring up the Spring Boot application for testing.
 
-The diagram below depicts the initialization process using classes which are highlighted in pink.
-
-![Integration Test Initialization](https://github.com/gavinklfong/spring-test-container-demo/blob/main/blob/Integration_Test_Init_Flow.png?raw=true)
-
-## Integration Test Design
-
-There is a layer to abstract away operations of MongoDB and RabbitMQ in order to make test steps simple and easy to understand.
-
-For data sharing among steps, we keep data in test data context. For example, step 3 is able to obtain the claim review update from test data context and verify the field values as the listener puts the data into the context once the application has submitted it to the topic exchange.
-
-![Integration Test Design](https://github.com/gavinklfong/spring-test-container-demo/blob/main/blob/Integration_Test_Run.png?raw=true)
+As part of the test case setup, a queue is binded to the exchange and so the test execution will get message on the queue for the test verification.

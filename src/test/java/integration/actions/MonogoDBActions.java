@@ -1,4 +1,4 @@
-package bdd.actions;
+package integration.actions;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestComponent;

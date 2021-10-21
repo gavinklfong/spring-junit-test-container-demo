@@ -1,4 +1,4 @@
-package bdd;
+package integration;
 
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -55,4 +55,19 @@ public class TestContainersSetup {
     public static String getMongoDBContainerUri() {
         return mongoDBContainer.getReplicaSetUrl();
     }
+
+//    public static String getRabbitMQContainerIPAddress() {
+//        return "localhost";
+//    }
+//
+//    public static int getRabbitMQContainerPort() {
+//        return 5672;
+//    }
+//
+//    public static int getRabbitMQContainerManagementPort() { return 15672; }
+//
+//    public static String getMongoDBContainerUri() {
+//        return "mongodb://localhost:27017/testdb";
+//    }
+
 }

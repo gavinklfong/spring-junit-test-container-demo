@@ -17,9 +17,6 @@ spring:
           group: processor
         claimStatusEventOutput:
           destination: claimUpdated.exchange
-        claimStatusEventInput:
-          destination: claimUpdated.exchange
-          group: receiver
 management:
   endpoints:
     web:

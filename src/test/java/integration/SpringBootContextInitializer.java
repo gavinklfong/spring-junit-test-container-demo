@@ -1,10 +1,10 @@
-package bdd;
+package integration;
 
 import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import static bdd.TestContainersSetup.*;
+import static integration.TestContainersSetup.*;
 
 public class SpringBootContextInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 

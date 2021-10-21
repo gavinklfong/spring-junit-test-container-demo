@@ -1,4 +1,4 @@
-package bdd;
+package integration;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +9,7 @@ import space.gavinklfong.demo.insurance.model.ClaimReviewResult;
 @TestComponent
 @RequiredArgsConstructor
 @Data
-public class CucumberTestContext {
+public class IntegrationTestContext {
     private ClaimRequest claimRequest;
     private ClaimReviewResult receivedClaimUpdate;
 
