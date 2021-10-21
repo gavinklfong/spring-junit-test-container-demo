@@ -1,6 +1,6 @@
 package bdd.messaging;
 
-import bdd.CucumberTestContext;
+import integration.IntegrationTestContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestComponent;
@@ -14,7 +14,7 @@ import static space.gavinklfong.demo.insurance.messaging.MessageChannels.CLAIM_S
 public class ClaimStatusEventListener {
 
     @Autowired
-    private CucumberTestContext testContext;
+    private IntegrationTestContext testContext;
 
     @StreamListener(CLAIM_STATUS_INPUT)
     public void handleClaimUpdateEvent(ClaimReviewResult claimReviewResult) {
