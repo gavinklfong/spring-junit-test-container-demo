@@ -6,8 +6,11 @@ import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import space.gavinklfong.demo.insurance.apiclients.CustomerSrvClient;
 import space.gavinklfong.demo.insurance.dto.ClaimRequest;
+import space.gavinklfong.demo.insurance.dto.Customer;
 import space.gavinklfong.demo.insurance.dto.Product;
+import space.gavinklfong.demo.insurance.dto.Risk;
 import space.gavinklfong.demo.insurance.model.ClaimReviewResult;
 import space.gavinklfong.demo.insurance.model.Status;
 import space.gavinklfong.demo.insurance.repository.ClaimProcessRepository;
@@ -22,6 +25,9 @@ public class ClaimReviewService {
 
     @Autowired
     private ClaimProcessRepository claimProcessRepo;
+
+    @Autowired
+    private CustomerSrvClient customerSrvClient;
 
     private MeterRegistry meterRegistry;
 
@@ -48,14 +54,9 @@ public class ClaimReviewService {
 
             Faker faker = new Faker();
 
-            Status claimStatus = Status.NEED_FOLLOW_UP;
-            if (claimRequest.getProduct() == Product.MEDICAL) {
-                if (claimRequest.getClaimAmount() < 5000) {
-                    claimStatus = Status.APPROVED;
-                } else {
-                    claimStatus = Status.DECLINED;
-                }
-            }
+            Customer customer = customerSrvClient.getCustomer(claimRequest.getCustomerId());
+
+            Status claimStatus = evaluateClaimRequest(claimRequest, customer);
 
             ClaimReviewResult result = ClaimReviewResult.builder()
                     .customerId(claimRequest.getCustomerId())
@@ -80,6 +81,25 @@ public class ClaimReviewService {
             log.error("claim process failed. processing time = {}, claim = {}", (end - start), claimRequest.toString());
             throw new RuntimeException("claim process failed. id = " + claimRequest.getId());
         }
+    }
+
+    private Status evaluateClaimRequest(ClaimRequest claimRequest, Customer customer) {
+
+        if (customer.getRisk().equals(Risk.HIGH)) {
+            return Status.DECLINED;
+        } else if (customer.getRisk().equals(Risk.MEDIUM)) {
+            return Status.NEED_FOLLOW_UP;
+        } else {
+            if (claimRequest.getProduct() == Product.MEDICAL) {
+                if (claimRequest.getClaimAmount() < 5000) {
+                    return Status.APPROVED;
+                } else {
+                    return Status.DECLINED;
+                }
+            }
+        }
+
+       return Status.NEED_FOLLOW_UP;
     }
 
     private void updateClaimStatusMetric(ClaimReviewResult result) {

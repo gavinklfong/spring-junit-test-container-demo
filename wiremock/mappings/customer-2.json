@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/customers/0753A8A5-6331-43E0-B868-6708058CEAB6"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": "{\"id\":\"0753A8A5-6331-43E0-B868-6708058CEAB6\", \"risk\":\"MEDIUM\"}"
+  }
+}

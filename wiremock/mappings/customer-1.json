@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/customers/C94C6168-6AED-46F9-9BA8-AA17793D41F9"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": "{\"id\":\"C94C6168-6AED-46F9-9BA8-AA17793D41F9\", \"risk\":\"HIGH\"}"
+  }
+}

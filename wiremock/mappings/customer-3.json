@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/customers/ABEF6840-4926-4A21-9837-42878D062C50"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": "{\"id\":\"ABEF6840-4926-4A21-9837-42878D062C50\", \"risk\":\":LOW\"}"
+  }
+}

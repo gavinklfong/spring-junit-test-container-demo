@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/customers"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": "[{\"id\":\"C94C6168-6AED-46F9-9BA8-AA17793D41F9\", \"risk\":\"HIGH\"},{\"id\":\"0753A8A5-6331-43E0-B868-6708058CEAB6\", \"risk\":\"MEDIUM\"},{\"id\":\"ABEF6840-4926-4A21-9837-42878D062C50\", \"risk\":\"LOW\"}]"
+  }
+}

@@ -1,6 +1,6 @@
 package integration.messaging;
 
-import integration.IntegrationTestContext;
+import integration.ComponentTestContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestComponent;
@@ -13,7 +13,7 @@ import space.gavinklfong.demo.insurance.model.ClaimReviewResult;
 public class ClaimStatusEventListener {
 
     @Autowired
-    private IntegrationTestContext testContext;
+    private ComponentTestContext testContext;
 
 //    @StreamListener(CLAIM_STATUS_INPUT)
     public void handleClaimUpdateEvent(ClaimReviewResult claimReviewResult) {
