@@ -20,7 +20,7 @@ Run this command to build and run all automated tests
 
 There are 3 component test cases for claim request handling for high risk customer, medium risk customer and low risk customer respectively.
 
-The sample JUnit test class is `component.tests.HighRiskClaimProcessingIntegrationTest`. It extends from `integration.AbstractComponentTest` which is responsible for the following setup:
+The sample JUnit test class is `component.tests.HighRiskCustomerClaimProcessingIntegrationTest`. It extends from `integration.AbstractComponentTest` which is responsible for the following setup:
 - Initialize rabbitmq and mongodb in test containers
 - Start up API mock server (i.e. wiremock) and register it as a bean
 - Bring up Spring Boot application for testing.
