@@ -1,12 +1,12 @@
-package integration.tests;
+package component.tests;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import integration.AbstractComponentTest;
-import integration.ComponentTestContext;
-import integration.actions.MonogoDBActions;
-import integration.setup.CustomerSrvSetup;
-import integration.setup.WireMockSetup;
+import component.AbstractComponentTest;
+import component.ComponentTestContext;
+import component.actions.MonogoDBActions;
+import component.setup.CustomerSrvSetup;
+import component.setup.WireMockSetup;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @Slf4j
-public class MediumRiskCustomerClaimProcessingComponentTest extends AbstractComponentTest {
+public class LowRiskCustomerClaimProcessingComponentTest extends AbstractComponentTest {
 
     @Autowired
     private MonogoDBActions monogoDBActions;
@@ -52,13 +52,12 @@ public class MediumRiskCustomerClaimProcessingComponentTest extends AbstractComp
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
-    private static final String HIGH_RISK_CUSTOMER_ID = "C94C6168-6AED-46F9-9BA8-AA17793D41F9";
-    private static final String MEDIUM_RISK_CUSTOMER_ID = "0753A8A5-6331-43E0-B868-6708058CEAB6";
-    private static final String LOW_RISK_CUSTOMER_ID = "ABEF6840-4926-4A21-9837-42878D062C50";
-
     private TopicExchange claimUpdatedExchange = new TopicExchange("claimUpdated.exchange");
     private Queue receiverQueue = new Queue("claimUpdated.exchange.receiver");
 
+    private static final String HIGH_RISK_CUSTOMER_ID = "C94C6168-6AED-46F9-9BA8-AA17793D41F9";
+    private static final String MEDIUM_RISK_CUSTOMER_ID = "0753A8A5-6331-43E0-B868-6708058CEAB6";
+    private static final String LOW_RISK_CUSTOMER_ID = "ABEF6840-4926-4A21-9837-42878D062C50";
 
     @AfterEach
     void afterEach() {
@@ -67,12 +66,12 @@ public class MediumRiskCustomerClaimProcessingComponentTest extends AbstractComp
     }
 
     @Test
-    void givenMediumRiskCustomer_whenHomePolicyClaimSubmitted_thenStatusIsNeedFollowUp() throws InterruptedException, IOException {
+    void givenLowRiskCustomer_whenHomePolicyClaimSubmitted_thenStatusIsNeedFollowUp() throws InterruptedException, IOException {
 
         givenListenerCreatedForClaimStatusUpdatedExchange();
-        givenMediumRiskCustomer();
+        givenLowRiskCustomer();
 
-        whenSubmitClaimRequestToQueue(MEDIUM_RISK_CUSTOMER_ID,"HOME", 1000D);
+        whenSubmitClaimRequestToQueue(LOW_RISK_CUSTOMER_ID,"HOME", 1000D);
         waitForXSeconds(2);
 
         thenClaimStatusIsReviewedAndSavedToDatabaseWithStatus("NEED_FOLLOW_UP");
@@ -81,15 +80,15 @@ public class MediumRiskCustomerClaimProcessingComponentTest extends AbstractComp
     }
 
     @Test
-    void givenMediumRiskCustomer_whenMedicalPolicyClaimBelow5kSubmitted_thenStatusIsApproved() throws InterruptedException, IOException {
+    void givenLowRiskCustomer_whenMedicalPolicyClaimBelow5kSubmitted_thenStatusIsApproved() throws InterruptedException, IOException {
 
         givenListenerCreatedForClaimStatusUpdatedExchange();
-        givenMediumRiskCustomer();
+        givenLowRiskCustomer();
 
-        whenSubmitClaimRequestToQueue(MEDIUM_RISK_CUSTOMER_ID,"MEDICAL", 100D);
+        whenSubmitClaimRequestToQueue(LOW_RISK_CUSTOMER_ID,"MEDICAL", 100D);
         waitForXSeconds(2);
 
-        thenClaimStatusIsReviewedAndSavedToDatabaseWithStatus("NEED_FOLLOW_UP");
+        thenClaimStatusIsReviewedAndSavedToDatabaseWithStatus("APPROVED");
         waitForXSeconds(1);
         thenClaimStatusIsSentToMessageQueueForCommunication();
     }
@@ -98,18 +97,26 @@ public class MediumRiskCustomerClaimProcessingComponentTest extends AbstractComp
     void givenLowRiskCustomer_whenMedicalPolicyClaimEq5kSubmitted_thenStatusIsDeclined() throws InterruptedException, IOException {
 
         givenListenerCreatedForClaimStatusUpdatedExchange();
-        givenMediumRiskCustomer();
+        givenLowRiskCustomer();
 
-        whenSubmitClaimRequestToQueue(MEDIUM_RISK_CUSTOMER_ID,"MEDICAL", 5000D);
+        whenSubmitClaimRequestToQueue(LOW_RISK_CUSTOMER_ID,"MEDICAL", 5000D);
         waitForXSeconds(2);
 
-        thenClaimStatusIsReviewedAndSavedToDatabaseWithStatus("NEED_FOLLOW_UP");
+        thenClaimStatusIsReviewedAndSavedToDatabaseWithStatus("DECLINED");
         waitForXSeconds(1);
         thenClaimStatusIsSentToMessageQueueForCommunication();
     }
 
+    private void givenHighRiskCustomer() throws JsonProcessingException {
+        customerSrvSetup.setUpCustomerForId(HIGH_RISK_CUSTOMER_ID, Risk.HIGH);
+    }
+
     private void givenMediumRiskCustomer() throws JsonProcessingException {
         customerSrvSetup.setUpCustomerForId(MEDIUM_RISK_CUSTOMER_ID, Risk.MEDIUM);
+    }
+
+    private void givenLowRiskCustomer() throws JsonProcessingException {
+        customerSrvSetup.setUpCustomerForId(LOW_RISK_CUSTOMER_ID, Risk.LOW);
     }
 
     private void givenListenerCreatedForClaimStatusUpdatedExchange() {

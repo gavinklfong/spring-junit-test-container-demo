@@ -1,11 +1,14 @@
-# Test Cointainer Demo For Spring Boot Using JUnit
+# Component Test Demo For Spring Boot Using JUnit
 
 ## Overview
-The purpose of this repository is to demonstrate the implementation of a fully automated integration test using JUnit + Testcontainers.
+The purpose of this repository is to demonstrate the implementation of a fully automated integration test using JUnit + API Mock Server (Wiremock) + Docker Test Containers.
 
-The sample application is a message driven insurance claim review process.
+The sample application is a message driven insurance claim review process. \
 
-![Application Component Diagram](https://github.com/gavinklfong/spring-test-container-demo/blob/main/blob/Sample_App.png?raw=true)
+When a claim request is received from message queue, this service fetches customer record from customer service via REST API followed by system logic to determine the claim review result.
+The claim review result will be sent to a message exchange for further distribution.
+
+![Application Component Diagram](https://github.com/gavinklfong/spring-junit-test-container-demo/blob/main/blob/Sample_App.png?raw=true)
 
 ## Build
 
@@ -13,12 +16,25 @@ Run this command to build and run all automated tests
 
 `mvn clean install`
 
-If you would like to run the integration test only, then run this command
+## Component Test Initialization
 
-`mvn -Dtest=ClaimProcessingIntegrationTest test`
+There are 3 component test cases for claim request handling for high risk customer, medium risk customer and low risk customer respectively.
 
-## Integration Test Initialization
+The sample JUnit test class is `component.tests.HighRiskClaimProcessingIntegrationTest`. It extends from `integration.AbstractComponentTest` which is responsible for the following setup:
+- Initialize rabbitmq and mongodb in test containers
+- Start up API mock server (i.e. wiremock) and register it as a bean
+- Bring up Spring Boot application for testing.
 
-The sample JUnit test class is `integration.tests.ClaimProcessingIntegrationTest`. It extends from `integration.AbstractIntegrationTest` which is responsible for initialize rabbitmq and mongodb in test containers and bring up the Spring Boot application for testing.
+## Test Case Pattern
 
-As part of the test case setup, a queue is binded to the exchange and so the test execution will get message on the queue for the test verification.
+Since test scenarios are to submit clain request for different scenarios, all test cases share similar `given-when-then` pattern:
+Given:
+- Setup a message queue and bind to the output message exchange
+- Setup mock customer API
+
+When:
+- Submit claim request to message queue
+
+Then:
+- Check claim result in database
+- Verify message in the output queue

@@ -1,12 +1,12 @@
-package integration.tests;
+package component.tests;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import integration.AbstractComponentTest;
-import integration.ComponentTestContext;
-import integration.actions.MonogoDBActions;
-import integration.setup.CustomerSrvSetup;
-import integration.setup.WireMockSetup;
+import component.AbstractComponentTest;
+import component.ComponentTestContext;
+import component.actions.MonogoDBActions;
+import component.setup.CustomerSrvSetup;
+import component.setup.WireMockSetup;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @Slf4j
-public class LowRiskCustomerClaimProcessingComponentTest extends AbstractComponentTest {
+public class HighRiskCustomerClaimProcessingComponentTest extends AbstractComponentTest {
 
     @Autowired
     private MonogoDBActions monogoDBActions;
@@ -66,40 +66,40 @@ public class LowRiskCustomerClaimProcessingComponentTest extends AbstractCompone
     }
 
     @Test
-    void givenLowRiskCustomer_whenHomePolicyClaimSubmitted_thenStatusIsNeedFollowUp() throws InterruptedException, IOException {
+    void givenHighRiskCustomer_whenHomePolicyClaimSubmitted_thenStatusIsDeclined() throws InterruptedException, IOException {
 
         givenListenerCreatedForClaimStatusUpdatedExchange();
-        givenLowRiskCustomer();
+        givenHighRiskCustomer();
 
-        whenSubmitClaimRequestToQueue(LOW_RISK_CUSTOMER_ID,"HOME", 1000D);
+        whenSubmitClaimRequestToQueue(HIGH_RISK_CUSTOMER_ID,"HOME", 1000D);
         waitForXSeconds(2);
 
-        thenClaimStatusIsReviewedAndSavedToDatabaseWithStatus("NEED_FOLLOW_UP");
+        thenClaimStatusIsReviewedAndSavedToDatabaseWithStatus("DECLINED");
         waitForXSeconds(1);
         thenClaimStatusIsSentToMessageQueueForCommunication();
     }
 
     @Test
-    void givenLowRiskCustomer_whenMedicalPolicyClaimBelow5kSubmitted_thenStatusIsApproved() throws InterruptedException, IOException {
+    void givenHighRiskCustomer_whenMedicalPolicyClaimBelow5kSubmitted_thenStatusIsDeclined() throws InterruptedException, IOException {
 
         givenListenerCreatedForClaimStatusUpdatedExchange();
-        givenLowRiskCustomer();
+        givenHighRiskCustomer();
 
-        whenSubmitClaimRequestToQueue(LOW_RISK_CUSTOMER_ID,"MEDICAL", 100D);
+        whenSubmitClaimRequestToQueue(HIGH_RISK_CUSTOMER_ID,"MEDICAL", 100D);
         waitForXSeconds(2);
 
-        thenClaimStatusIsReviewedAndSavedToDatabaseWithStatus("APPROVED");
+        thenClaimStatusIsReviewedAndSavedToDatabaseWithStatus("DECLINED");
         waitForXSeconds(1);
         thenClaimStatusIsSentToMessageQueueForCommunication();
     }
 
     @Test
-    void givenLowRiskCustomer_whenMedicalPolicyClaimEq5kSubmitted_thenStatusIsDeclined() throws InterruptedException, IOException {
+    void givenHighRiskCustomer_whenMedicalPolicyClaimEq5kSubmitted_thenStatusIsDeclined() throws InterruptedException, IOException {
 
         givenListenerCreatedForClaimStatusUpdatedExchange();
-        givenLowRiskCustomer();
+        givenHighRiskCustomer();
 
-        whenSubmitClaimRequestToQueue(LOW_RISK_CUSTOMER_ID,"MEDICAL", 5000D);
+        whenSubmitClaimRequestToQueue(HIGH_RISK_CUSTOMER_ID,"MEDICAL", 5000D);
         waitForXSeconds(2);
 
         thenClaimStatusIsReviewedAndSavedToDatabaseWithStatus("DECLINED");
@@ -109,14 +109,6 @@ public class LowRiskCustomerClaimProcessingComponentTest extends AbstractCompone
 
     private void givenHighRiskCustomer() throws JsonProcessingException {
         customerSrvSetup.setUpCustomerForId(HIGH_RISK_CUSTOMER_ID, Risk.HIGH);
-    }
-
-    private void givenMediumRiskCustomer() throws JsonProcessingException {
-        customerSrvSetup.setUpCustomerForId(MEDIUM_RISK_CUSTOMER_ID, Risk.MEDIUM);
-    }
-
-    private void givenLowRiskCustomer() throws JsonProcessingException {
-        customerSrvSetup.setUpCustomerForId(LOW_RISK_CUSTOMER_ID, Risk.LOW);
     }
 
     private void givenListenerCreatedForClaimStatusUpdatedExchange() {

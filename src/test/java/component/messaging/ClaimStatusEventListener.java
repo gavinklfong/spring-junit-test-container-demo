@@ -1,6 +1,6 @@
-package integration.messaging;
+package component.messaging;
 
-import integration.ComponentTestContext;
+import component.ComponentTestContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestComponent;

@@ -1,13 +1,13 @@
-package integration;
+package component;
 
-import integration.setup.TestContainersSetup;
-import integration.setup.WireMockSetup;
+import component.setup.TestContainersSetup;
+import component.setup.WireMockSetup;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import static integration.setup.TestContainersSetup.*;
+import static component.setup.TestContainersSetup.*;
 
 @Slf4j
 public class SpringBootContextInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {

@@ -1,4 +1,4 @@
-package integration.setup;
+package component.setup;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import org.springframework.context.ConfigurableApplicationContext;

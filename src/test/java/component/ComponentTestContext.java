@@ -1,4 +1,4 @@
-package integration;
+package component;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
