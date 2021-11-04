@@ -17,6 +17,8 @@ import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import space.gavinklfong.demo.insurance.dto.ClaimRequest;
 import space.gavinklfong.demo.insurance.dto.Priority;
 import space.gavinklfong.demo.insurance.dto.Product;
@@ -33,7 +35,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @Slf4j
-public class HighRiskCustomerClaimProcessingComponentTest extends AbstractComponentTest {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles(profiles={"local-test"})
+public class ClaimProcessingLocalEnvTest {
 
     @Autowired
     private MonogoDBActions monogoDBActions;
@@ -107,8 +111,87 @@ public class HighRiskCustomerClaimProcessingComponentTest extends AbstractCompon
         thenClaimStatusIsSentToMessageQueueForCommunication();
     }
 
+
+    @Test
+    void givenLowRiskCustomer_whenHomePolicyClaimSubmitted_thenStatusIsNeedFollowUp() throws InterruptedException, IOException {
+
+        givenListenerCreatedForClaimStatusUpdatedExchange();
+        givenLowRiskCustomer();
+
+        whenSubmitClaimRequestToQueue(LOW_RISK_CUSTOMER_ID,"HOME", 1000D);
+        waitForXSeconds(2);
+
+        thenClaimStatusIsReviewedAndSavedToDatabaseWithStatus("NEED_FOLLOW_UP");
+        waitForXSeconds(1);
+        thenClaimStatusIsSentToMessageQueueForCommunication();
+    }
+
+    @Test
+    void givenLowRiskCustomer_whenMedicalPolicyClaimBelow5kSubmitted_thenStatusIsApproved() throws InterruptedException, IOException {
+
+        givenListenerCreatedForClaimStatusUpdatedExchange();
+        givenLowRiskCustomer();
+
+        whenSubmitClaimRequestToQueue(LOW_RISK_CUSTOMER_ID,"MEDICAL", 100D);
+        waitForXSeconds(2);
+
+        thenClaimStatusIsReviewedAndSavedToDatabaseWithStatus("APPROVED");
+        waitForXSeconds(1);
+        thenClaimStatusIsSentToMessageQueueForCommunication();
+    }
+
+    @Test
+    void givenMediumRiskCustomer_whenHomePolicyClaimSubmitted_thenStatusIsNeedFollowUp() throws InterruptedException, IOException {
+
+        givenListenerCreatedForClaimStatusUpdatedExchange();
+        givenMediumRiskCustomer();
+
+        whenSubmitClaimRequestToQueue(MEDIUM_RISK_CUSTOMER_ID,"HOME", 1000D);
+        waitForXSeconds(2);
+
+        thenClaimStatusIsReviewedAndSavedToDatabaseWithStatus("NEED_FOLLOW_UP");
+        waitForXSeconds(1);
+        thenClaimStatusIsSentToMessageQueueForCommunication();
+    }
+
+    @Test
+    void givenMediumRiskCustomer_whenMedicalPolicyClaimBelow5kSubmitted_thenStatusIsApproved() throws InterruptedException, IOException {
+
+        givenListenerCreatedForClaimStatusUpdatedExchange();
+        givenMediumRiskCustomer();
+
+        whenSubmitClaimRequestToQueue(MEDIUM_RISK_CUSTOMER_ID,"MEDICAL", 100D);
+        waitForXSeconds(2);
+
+        thenClaimStatusIsReviewedAndSavedToDatabaseWithStatus("NEED_FOLLOW_UP");
+        waitForXSeconds(1);
+        thenClaimStatusIsSentToMessageQueueForCommunication();
+    }
+
+    @Test
+    void givenLowRiskCustomer_whenMedicalPolicyClaimEq5kSubmitted_thenStatusIsDeclined() throws InterruptedException, IOException {
+
+        givenListenerCreatedForClaimStatusUpdatedExchange();
+        givenMediumRiskCustomer();
+
+        whenSubmitClaimRequestToQueue(MEDIUM_RISK_CUSTOMER_ID,"MEDICAL", 5000D);
+        waitForXSeconds(2);
+
+        thenClaimStatusIsReviewedAndSavedToDatabaseWithStatus("NEED_FOLLOW_UP");
+        waitForXSeconds(1);
+        thenClaimStatusIsSentToMessageQueueForCommunication();
+    }
+
     private void givenHighRiskCustomer() throws JsonProcessingException {
         customerSrvSetup.setUpCustomerForId(HIGH_RISK_CUSTOMER_ID, Risk.HIGH);
+    }
+
+    private void givenMediumRiskCustomer() throws JsonProcessingException {
+        customerSrvSetup.setUpCustomerForId(MEDIUM_RISK_CUSTOMER_ID, Risk.MEDIUM);
+    }
+
+    private void givenLowRiskCustomer() throws JsonProcessingException {
+        customerSrvSetup.setUpCustomerForId(LOW_RISK_CUSTOMER_ID, Risk.LOW);
     }
 
     private void givenListenerCreatedForClaimStatusUpdatedExchange() {

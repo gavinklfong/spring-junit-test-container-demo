@@ -3,6 +3,7 @@ package component.setup;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 
 public class WireMockSetup {
@@ -12,7 +13,7 @@ public class WireMockSetup {
     public static void registerComponent(ConfigurableApplicationContext configurableApplicationContext) {
         configurableApplicationContext.getBeanFactory().registerSingleton("wireMockServer", wireMockServer);
     }
-
+    
     public static void setUp() {
         wireMockServer.start();
     }

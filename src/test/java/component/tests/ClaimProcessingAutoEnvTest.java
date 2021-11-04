@@ -33,7 +33,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @Slf4j
-public class LowRiskCustomerClaimProcessingComponentTest extends AbstractComponentTest {
+public class ClaimProcessingComponentTest extends AbstractComponentTest {
 
     @Autowired
     private MonogoDBActions monogoDBActions;
@@ -66,6 +66,49 @@ public class LowRiskCustomerClaimProcessingComponentTest extends AbstractCompone
     }
 
     @Test
+    void givenHighRiskCustomer_whenHomePolicyClaimSubmitted_thenStatusIsDeclined() throws InterruptedException, IOException {
+
+        givenListenerCreatedForClaimStatusUpdatedExchange();
+        givenHighRiskCustomer();
+
+        whenSubmitClaimRequestToQueue(HIGH_RISK_CUSTOMER_ID,"HOME", 1000D);
+        waitForXSeconds(2);
+
+        thenClaimStatusIsReviewedAndSavedToDatabaseWithStatus("DECLINED");
+        waitForXSeconds(1);
+        thenClaimStatusIsSentToMessageQueueForCommunication();
+    }
+
+    @Test
+    void givenHighRiskCustomer_whenMedicalPolicyClaimBelow5kSubmitted_thenStatusIsDeclined() throws InterruptedException, IOException {
+
+        givenListenerCreatedForClaimStatusUpdatedExchange();
+        givenHighRiskCustomer();
+
+        whenSubmitClaimRequestToQueue(HIGH_RISK_CUSTOMER_ID,"MEDICAL", 100D);
+        waitForXSeconds(2);
+
+        thenClaimStatusIsReviewedAndSavedToDatabaseWithStatus("DECLINED");
+        waitForXSeconds(1);
+        thenClaimStatusIsSentToMessageQueueForCommunication();
+    }
+
+    @Test
+    void givenHighRiskCustomer_whenMedicalPolicyClaimEq5kSubmitted_thenStatusIsDeclined() throws InterruptedException, IOException {
+
+        givenListenerCreatedForClaimStatusUpdatedExchange();
+        givenHighRiskCustomer();
+
+        whenSubmitClaimRequestToQueue(HIGH_RISK_CUSTOMER_ID,"MEDICAL", 5000D);
+        waitForXSeconds(2);
+
+        thenClaimStatusIsReviewedAndSavedToDatabaseWithStatus("DECLINED");
+        waitForXSeconds(1);
+        thenClaimStatusIsSentToMessageQueueForCommunication();
+    }
+
+
+    @Test
     void givenLowRiskCustomer_whenHomePolicyClaimSubmitted_thenStatusIsNeedFollowUp() throws InterruptedException, IOException {
 
         givenListenerCreatedForClaimStatusUpdatedExchange();
@@ -94,15 +137,43 @@ public class LowRiskCustomerClaimProcessingComponentTest extends AbstractCompone
     }
 
     @Test
+    void givenMediumRiskCustomer_whenHomePolicyClaimSubmitted_thenStatusIsNeedFollowUp() throws InterruptedException, IOException {
+
+        givenListenerCreatedForClaimStatusUpdatedExchange();
+        givenMediumRiskCustomer();
+
+        whenSubmitClaimRequestToQueue(MEDIUM_RISK_CUSTOMER_ID,"HOME", 1000D);
+        waitForXSeconds(2);
+
+        thenClaimStatusIsReviewedAndSavedToDatabaseWithStatus("NEED_FOLLOW_UP");
+        waitForXSeconds(1);
+        thenClaimStatusIsSentToMessageQueueForCommunication();
+    }
+
+    @Test
+    void givenMediumRiskCustomer_whenMedicalPolicyClaimBelow5kSubmitted_thenStatusIsApproved() throws InterruptedException, IOException {
+
+        givenListenerCreatedForClaimStatusUpdatedExchange();
+        givenMediumRiskCustomer();
+
+        whenSubmitClaimRequestToQueue(MEDIUM_RISK_CUSTOMER_ID,"MEDICAL", 100D);
+        waitForXSeconds(2);
+
+        thenClaimStatusIsReviewedAndSavedToDatabaseWithStatus("NEED_FOLLOW_UP");
+        waitForXSeconds(1);
+        thenClaimStatusIsSentToMessageQueueForCommunication();
+    }
+
+    @Test
     void givenLowRiskCustomer_whenMedicalPolicyClaimEq5kSubmitted_thenStatusIsDeclined() throws InterruptedException, IOException {
 
         givenListenerCreatedForClaimStatusUpdatedExchange();
-        givenLowRiskCustomer();
+        givenMediumRiskCustomer();
 
-        whenSubmitClaimRequestToQueue(LOW_RISK_CUSTOMER_ID,"MEDICAL", 5000D);
+        whenSubmitClaimRequestToQueue(MEDIUM_RISK_CUSTOMER_ID,"MEDICAL", 5000D);
         waitForXSeconds(2);
 
-        thenClaimStatusIsReviewedAndSavedToDatabaseWithStatus("DECLINED");
+        thenClaimStatusIsReviewedAndSavedToDatabaseWithStatus("NEED_FOLLOW_UP");
         waitForXSeconds(1);
         thenClaimStatusIsSentToMessageQueueForCommunication();
     }
