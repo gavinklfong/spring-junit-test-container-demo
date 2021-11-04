@@ -12,9 +12,9 @@ The claim review result will be sent to a message exchange for further distribut
 
 ## Build
 
-Run this command to build and run all automated tests
+Run this command to build and run the sample automated test
 
-`mvn clean install`
+`mvn -Dtest=ClaimProcessingAutoEnvTest clean test`
 
 ## Component Test Initialization
 
